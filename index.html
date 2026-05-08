@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)" />
+  <title>Alphabetic</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HOME SCREEN -->
+  <div id="screen-home" class="screen active">
+    <header>
+      <h1>Alphabetic</h1>
+      <button id="btn-stats-home" class="icon-btn" aria-label="Stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      </button>
+    </header>
+
+    <p class="subtitle">Guess the word — closer in the alphabet each time.</p>
+
+    <section class="mode-select">
+      <button class="mode-btn active" data-mode="daily">Daily</button>
+      <button class="mode-btn" data-mode="infinite">Infinite</button>
+    </section>
+
+    <section class="length-select">
+      <p class="label">Word length</p>
+      <div class="length-pills" id="length-pills"></div>
+    </section>
+
+    <button id="btn-play" class="primary-btn">Play</button>
+
+    <footer>
+      <span>A game by <strong>Ethan Kaplan</strong> · Coded by <strong>Guillermo</strong></span>
+    </footer>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <header>
+      <button id="btn-back" class="icon-btn" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="game-meta">
+        <span id="game-mode-label"></span>
+        <span id="game-length-label"></span>
+      </div>
+      <button id="btn-stats-game" class="icon-btn" aria-label="Stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      </button>
+    </header>
+
+    <div class="guess-counter">
+      Guess <span id="guess-num">1</span>
+    </div>
+
+    <ul id="guess-list" class="guess-list" aria-live="polite"></ul>
+
+    <form id="guess-form" class="guess-form" autocomplete="off">
+      <div class="letter-boxes-wrap">
+        <div id="letter-boxes" class="letter-boxes" role="button" tabindex="0" aria-label="Type your guess"></div>
+        <!-- Real input for keyboard capture (invisible but focusable) -->
+        <input id="guess-input" type="text" class="ghost-input" maxlength="10"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-hidden="true" />
+      </div>
+      <button type="submit" class="primary-btn submit-btn">Go</button>
+    </form>
+    <p id="guess-error" class="error-msg" aria-live="assertive"></p>
+    <button id="btn-give-up" class="give-up-btn">Give up</button>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="screen-win" class="screen">
+    <header>
+      <button id="btn-win-home" class="icon-btn" aria-label="Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span></span>
+      <button id="btn-stats-win" class="icon-btn" aria-label="Stats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      </button>
+    </header>
+
+    <div class="win-card">
+      <p class="win-label">The word was</p>
+      <p id="win-word" class="win-word"></p>
+      <p id="win-count" class="win-count"></p>
+      <button id="btn-share" class="secondary-btn">Copy result</button>
+    </div>
+
+    <div class="win-actions">
+      <button id="btn-play-again" class="primary-btn">Play again</button>
+    </div>
+
+    <footer>
+      <span>A game by <strong>Ethan Kaplan</strong> · Coded by <strong>Guillermo</strong></span>
+    </footer>
+  </div>
+
+  <!-- STATS MODAL -->
+  <div id="stats-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Statistics">
+    <div class="modal-backdrop"></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Stats</h2>
+        <button id="btn-close-stats" class="icon-btn" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="stats-length-tabs" id="stats-length-tabs"></div>
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="stats-chart" id="stats-chart"></div>
+    </div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="confirm-backdrop"></div>
+    <div class="modal-box confirm-box">
+      <p id="confirm-msg" class="confirm-msg"></p>
+      <div class="confirm-actions">
+        <button id="confirm-cancel" class="secondary-btn">Cancel</button>
+        <button id="confirm-ok" class="primary-btn confirm-ok-btn"></button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
