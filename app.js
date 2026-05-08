@@ -1,5 +1,5 @@
 import { getDailyWord, getRandomWord, evaluateGuess, isValidWord, getWordLengths, getTodayKey } from './game.js';
-import { getStats, recordWin, recordLoss, getDailyPlayed, setDailyPlayed } from './stats.js';
+import { getStats, recordWin, recordLoss, getDailyPlayed, setDailyPlayed, saveProgress, loadProgress, clearProgress } from './stats.js';
 
 let state = {
   mode: 'daily',
@@ -152,6 +152,7 @@ $('btn-give-up').addEventListener('click', () => {
     } else if (state.mode === 'infinite') {
       recordLoss(state.length);
     }
+    clearProgress();
     showWin(state.target, state.guesses.length);
   });
 });
@@ -178,9 +179,28 @@ function startGame(replay = false) {
         );
         return;
       }
+      const saved = loadProgress();
+      if (saved && saved.mode === 'daily' && saved.length === state.length
+          && saved.todayKey === todayKey
+          && saved.guesses && !saved.guesses.some(g => g.result === 'correct')) {
+        state.guesses = saved.guesses;
+        console.log('[Alphabetic] resumed daily game with %d guesses', state.guesses.length);
+      }
     }
   } else {
-    state.target = getRandomWord(state.length);
+    if (!replay) {
+      const saved = loadProgress();
+      if (saved && saved.mode === 'infinite' && saved.length === state.length
+          && saved.guesses && !saved.guesses.some(g => g.result === 'correct')) {
+        state.target = saved.target;
+        state.guesses = saved.guesses;
+        console.log('[Alphabetic] resumed infinite game with %d guesses', state.guesses.length);
+      } else {
+        state.target = getRandomWord(state.length);
+      }
+    } else {
+      state.target = getRandomWord(state.length);
+    }
   }
 
   buildLetterBoxes(state.length);
@@ -188,11 +208,10 @@ function startGame(replay = false) {
   guessInput.value = '';
   syncBoxes('');
   $('guess-error').textContent = '';
-  $('guess-num').textContent = '1';
+  $('guess-num').textContent = state.guesses.length + 1;
   $('game-mode-label').textContent = state.mode === 'daily' ? 'Daily' : 'Infinite';
   $('game-length-label').textContent = `${state.length} letters`;
 
-  // Show initial mystery placeholder
   renderGuessList();
   showScreen('game');
 }
@@ -234,7 +253,10 @@ $('guess-form').addEventListener('submit', e => {
         setDailyPlayed(state.length, getTodayKey(), { guessCount: count, guesses: state.guesses });
       }
     }
+    clearProgress();
     setTimeout(() => showWin(state.target, count), 700);
+  } else {
+    saveProgress({ mode: state.mode, length: state.length, target: state.target, guesses: state.guesses, todayKey: getTodayKey() });
   }
 });
 
@@ -394,6 +416,19 @@ function renderStats(length) {
 // ── Boot ──────────────────────────────────────────────────────────────────────
 initHome();
 showScreen('home');
+
+(function resumeIfNeeded() {
+  const saved = loadProgress();
+  if (!saved || !saved.guesses || saved.guesses.length === 0) return;
+  if (saved.guesses.some(g => g.result === 'correct')) { clearProgress(); return; }
+  const todayKey = getTodayKey();
+  if (saved.mode === 'daily' && saved.todayKey !== todayKey) { clearProgress(); return; }
+  state.mode = saved.mode;
+  state.length = saved.length;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
+  console.log('[Alphabetic] auto-resuming %s %d-letter game', state.mode, state.length);
+  startGame(false);
+}());
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
