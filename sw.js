@@ -1,4 +1,4 @@
-const CACHE = 'alphabetic-v4';
+const CACHE = 'alphabetic-v5';
 const ASSETS = [
   './',
   './index.html',

@@ -5,10 +5,12 @@ let state = {
   mode: 'daily',
   length: 5,
   target: '',
-  guesses: [], // [{word, result}]
+  guesses: [],
   done: false,
   gaveUp: false,
   isReplay: false,
+  viewingResult: false,
+  attemptNum: 1,
 };
 
 const $ = id => document.getElementById(id);
@@ -106,12 +108,31 @@ function renderLengthPills() {
     btn.textContent = `${len} letters`;
     btn.dataset.len = len;
     btn.addEventListener('click', () => {
+      if (played) { showDailyReview(len); return; }
       state.length = len;
       pillsEl.querySelectorAll('.length-pill').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
     });
     pillsEl.appendChild(btn);
   });
+}
+
+function showDailyReview(length) {
+  const todayKey = getTodayKey();
+  const played = getDailyPlayed(length, todayKey);
+  if (!played) return;
+
+  state.length = length;
+  state.mode = 'daily';
+  state.viewingResult = true;
+  state.gaveUp = !!played.gaveUp;
+  state.isReplay = false;
+  state.guesses = played.guesses || [];
+  state.target = getDailyWord(length);
+  state.attemptNum = played.plays || 1;
+
+  const guessCount = played.guessCount ?? played.guesses?.length ?? 0;
+  showWin(state.target, guessCount);
 }
 
 function initHome() {
@@ -129,9 +150,26 @@ function initHome() {
 
 $('btn-play').addEventListener('click', () => startGame());
 $('btn-back').addEventListener('click', () => { showScreen('home'); renderLengthPills(); });
-$('btn-win-home').addEventListener('click', () => { showScreen('home'); renderLengthPills(); });
+$('btn-win-home').addEventListener('click', () => {
+  state.viewingResult = false;
+  showScreen('home');
+  renderLengthPills();
+});
 $('btn-play-again').addEventListener('click', () => {
-  if (state.mode === 'infinite') { startGame(); } else { showScreen('home'); }
+  if (state.mode === 'infinite') {
+    startGame();
+  } else if (state.viewingResult) {
+    const todayKey = getTodayKey();
+    const played = getDailyPlayed(state.length, todayKey);
+    const newPlays = (played?.plays || 1) + 1;
+    setDailyPlayed(state.length, todayKey, { ...played, plays: newPlays });
+    state.attemptNum = newPlays;
+    state.viewingResult = false;
+    startGame(true);
+  } else {
+    showScreen('home');
+    renderLengthPills();
+  }
 });
 
 ['btn-stats-home','btn-stats-game','btn-stats-win'].forEach(id => {
@@ -160,6 +198,8 @@ $('btn-give-up').addEventListener('click', () => {
 // ── Game ──────────────────────────────────────────────────────────────────────
 function startGame(replay = false) {
   state.isReplay = replay;
+  state.viewingResult = false;
+  if (!replay) state.attemptNum = 1;
   state.guesses = [];
   state.done = false;
   state.gaveUp = false;
@@ -332,17 +372,24 @@ function showWin(word, guessCount) {
   wordEl.textContent = word;
   wordEl.classList.toggle('gave-up', state.gaveUp);
 
+  const attemptSuffix = state.attemptNum > 1 ? ` (attempt ${state.attemptNum})` : '';
   let countText;
   if (state.gaveUp) {
-    countText = `Gave up after ${guessCount} ${guessCount === 1 ? 'guess' : 'guesses'}`;
-  } else if (state.isReplay) {
-    countText = `Solved in ${guessCount} ${guessCount === 1 ? 'guess' : 'guesses'} (replay)`;
+    countText = `Gave up after ${guessCount} ${guessCount === 1 ? 'guess' : 'guesses'}${attemptSuffix}`;
   } else {
-    countText = `Solved in ${guessCount} ${guessCount === 1 ? 'guess' : 'guesses'}`;
+    countText = `Solved in ${guessCount} ${guessCount === 1 ? 'guess' : 'guesses'}${attemptSuffix}`;
   }
 
   $('win-count').textContent = countText;
-  $('btn-play-again').textContent = state.mode === 'infinite' ? 'Play again' : 'Back to home';
+
+  if (state.mode === 'infinite') {
+    $('btn-play-again').textContent = 'Play again';
+  } else if (state.viewingResult) {
+    $('btn-play-again').textContent = `Play again (attempt ${state.attemptNum + 1})`;
+  } else {
+    $('btn-play-again').textContent = 'Back to home';
+  }
+
   showScreen('win');
 }
 
@@ -397,9 +444,9 @@ function renderStats(length) {
   const chartEl = $('stats-chart');
   chartEl.innerHTML = '';
 
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 30; i++) {
     const c = counts[i] || 0;
-    if (i > 6 && c === 0) continue;
+    if (i > 10 && c === 0) continue;
     const pct = Math.round((c / maxCount) * 100);
     const row = document.createElement('div');
     row.className = 'chart-row';

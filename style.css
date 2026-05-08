@@ -539,7 +539,7 @@ footer strong { color: var(--text); }
 }
 
 .chart-num {
-  width: 14px;
+  width: 24px;
   text-align: right;
   color: var(--text-muted);
   flex-shrink: 0;
