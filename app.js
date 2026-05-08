@@ -127,7 +127,7 @@ function initHome() {
   });
 }
 
-$('btn-play').addEventListener('click', startGame);
+$('btn-play').addEventListener('click', () => startGame());
 $('btn-back').addEventListener('click', () => { showScreen('home'); renderLengthPills(); });
 $('btn-win-home').addEventListener('click', () => { showScreen('home'); renderLengthPills(); });
 $('btn-play-again').addEventListener('click', () => {
