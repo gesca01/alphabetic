@@ -198,6 +198,11 @@ footer {
 footer strong { color: var(--text); }
 
 /* ── GAME SCREEN ─────────────────────────────────────────────────────────── */
+#screen-game {
+  min-height: unset;
+  height: 100dvh;
+}
+
 .game-meta {
   display: flex;
   flex-direction: column;
@@ -222,6 +227,8 @@ footer strong { color: var(--text); }
   gap: 6px;
   margin-bottom: 16px;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .guess-item {

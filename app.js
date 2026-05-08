@@ -398,3 +398,14 @@ showScreen('home');
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const gameEl = screens.game;
+    if (gameEl.classList.contains('active')) {
+      gameEl.style.height = `${window.visualViewport.height}px`;
+    } else {
+      gameEl.style.height = '';
+    }
+  });
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)" />
   <title>Alphabetic</title>
@@ -65,6 +65,7 @@
         <div id="letter-boxes" class="letter-boxes" role="button" tabindex="0" aria-label="Type your guess"></div>
         <!-- Real input for keyboard capture (invisible but focusable) -->
         <input id="guess-input" type="text" class="ghost-input" maxlength="10"
+               inputmode="text"
                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-hidden="true" />
       </div>
       <button type="submit" class="primary-btn submit-btn">Go</button>
