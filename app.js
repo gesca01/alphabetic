@@ -322,6 +322,9 @@ function renderGuessList() {
   sorted.slice(0, placeholderIdx).forEach(g => listEl.appendChild(makeGuessRow(g)));
   listEl.appendChild(makeMysteryRow(correctGuess ? correctGuess.word : null));
   sorted.slice(placeholderIdx).forEach(g => listEl.appendChild(makeGuessRow(g)));
+
+  const mystery = listEl.querySelector('.mystery');
+  if (mystery) mystery.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 function makeGuessRow({ word, result }) {
@@ -486,6 +489,8 @@ if (window.visualViewport) {
     const gameEl = screens.game;
     if (gameEl.classList.contains('active')) {
       gameEl.style.height = `${window.visualViewport.height}px`;
+      const mystery = gameEl.querySelector('.mystery');
+      if (mystery) mystery.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     } else {
       gameEl.style.height = '';
     }
