@@ -46,10 +46,7 @@ export function evaluateGuess(guess, target) {
 export function isValidWord(word, length) {
   const w = word.toLowerCase();
   if (w.length !== length) return false;
-  if ((VALID_WORDS[length] || []).includes(w)) return true;
-  // Accept simple +s plurals whose singular is a real word one letter shorter
-  if (w.endsWith('s') && (VALID_WORDS[length - 1] || []).includes(w.slice(0, -1))) return true;
-  return false;
+  return (VALID_WORDS[length] || []).includes(w);
 }
 
 export function getWordLengths() {
