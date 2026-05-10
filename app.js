@@ -74,8 +74,6 @@ guessInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); $('guess-form').requestSubmit(); }
 });
 
-guessInput.addEventListener('focus', () => screens.game.classList.add('keyboard-open'));
-guessInput.addEventListener('blur',  () => screens.game.classList.remove('keyboard-open'));
 
 // ── Confirmation modal ────────────────────────────────────────────────────────
 function showConfirm(message, okLabel, onOk) {

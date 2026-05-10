@@ -390,7 +390,6 @@ footer strong { color: var(--text); }
   transition: opacity 0.15s;
 }
 .give-up-btn:hover { opacity: 1; }
-#screen-game.keyboard-open .give-up-btn { display: none; }
 
 /* WIN SCREEN */
 .win-card {
